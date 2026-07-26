@@ -1,6 +1,8 @@
 build/
-.vscode/
 *.exe
-*.o
 *.obj
+*.ilk
 *.pdb
+*.vcxproj*
+CMakeCache.txt
+CMakeFiles/

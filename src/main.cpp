@@ -1,6 +1,7 @@
 #include <iostream>
 #include "../include/logger.h"
 #include "../include/config.h"
+#include "../include/command.h"
 
 int main()
 {
@@ -24,6 +25,17 @@ int main()
 
     Logger::Log(
         "Voice : " + Config::GetVoice());
+
+    Logger::Log("Jarvis Started", LogLevel::INFO);
+
+    bool running = true;
+
+    while (running)
+    {
+        std::string cmd = Command::GetCommand();
+
+        running = Command::ProcessCommand(cmd);
+    }
 
     return 0;
 }
