@@ -1,0 +1,8 @@
+{
+    "assistant_name": "Jarvis",
+    "language": "en-IN",
+    "voice": "Male",
+    "gemini_api_key": "",
+    "weather_api_key": "",
+    "debug": true
+}
