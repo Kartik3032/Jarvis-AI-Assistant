@@ -10,6 +10,7 @@ add_executable(JarvisAI
     src/logger.cpp
     src/config.cpp
     src/command.cpp
+     src/parser.cpp
 )
 
 target_include_directories(JarvisAI PRIVATE include)

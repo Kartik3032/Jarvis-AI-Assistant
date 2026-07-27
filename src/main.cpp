@@ -2,6 +2,7 @@
 #include "../include/logger.h"
 #include "../include/config.h"
 #include "../include/command.h"
+#include "../include/parser.h"
 
 int main()
 {
@@ -33,9 +34,7 @@ int main()
     while (running)
     {
         std::string cmd = Command::GetCommand();
-
         running = Command::ProcessCommand(cmd);
     }
-
     return 0;
 }

@@ -1,10 +1,10 @@
 #include <chrono>
-#include <iomanip>
 #include <ctime>
+#include <iomanip>
+#include <iostream>
 
 #include "../include/command.h"
-
-#include <iostream>
+#include "../include/parser.h"
 
 std::string Command::GetCommand()
 {
@@ -19,6 +19,8 @@ std::string Command::GetCommand()
 
 bool Command::ProcessCommand(const std::string &command)
 {
+    ParsedCommand parsed = Parser::Parse(command);
+
     if (command == "help")
     {
         std::cout << "Available Commands\n";
@@ -27,10 +29,10 @@ bool Command::ProcessCommand(const std::string &command)
         std::cout << "date\n";
         std::cout << "clear\n";
         std::cout << "about\n";
-        std::cout << "notepad\n";
-        std::cout << "calculator\n";
-        std::cout << "chrome\n";
-        std::cout << "youtube\n";
+        std::cout << "open chrome\n";
+        std::cout << "open calculator\n";
+        std::cout << "open notepad\n";
+        std::cout << "open youtube\n";
         std::cout << "exit\n";
     }
 
@@ -80,24 +82,28 @@ bool Command::ProcessCommand(const std::string &command)
         std::cout << "Jarvis AI v1.0\n";
     }
 
-    else if (command == "notepad")
+    else if (parsed.action == "open")
     {
-        system("start notepad");
-    }
-
-    else if (command == "calculator")
-    {
-        system("start calc");
-    }
-
-    else if (command == "chrome")
-    {
-        system("start chrome");
-    }
-
-    else if (command == "youtube")
-    {
-        system("start https://youtube.com");
+        if (parsed.target == "chrome")
+        {
+            system("start chrome");
+        }
+        else if (parsed.target == "calculator")
+        {
+            system("start calc");
+        }
+        else if (parsed.target == "notepad")
+        {
+            system("start notepad");
+        }
+        else if (parsed.target == "youtube")
+        {
+            system("start https://youtube.com");
+        }
+        else
+        {
+            std::cout << "Unknown application\n";
+        }
     }
 
     else if (command == "exit")
