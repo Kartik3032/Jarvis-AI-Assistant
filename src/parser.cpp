@@ -10,6 +10,7 @@ ParsedCommand Parser::Parse(const std::string &input)
 
     ss >> cmd.action;
     ss >> cmd.target;
+    ss >> cmd.argument;
 
     return cmd;
 }

@@ -5,13 +5,14 @@
 
 #include "../include/command.h"
 #include "../include/parser.h"
+#include "../include/app_launcher.h"
+#include "../include/file_manager.h"
 
 std::string Command::GetCommand()
 {
     std::cout << "\nJarvis > ";
 
     std::string command;
-
     std::getline(std::cin, command);
 
     return command;
@@ -33,6 +34,7 @@ bool Command::ProcessCommand(const std::string &command)
         std::cout << "open calculator\n";
         std::cout << "open notepad\n";
         std::cout << "open youtube\n";
+        std::cout << "create folder <name>\n";
         std::cout << "exit\n";
     }
 
@@ -84,28 +86,50 @@ bool Command::ProcessCommand(const std::string &command)
 
     else if (parsed.action == "open")
     {
-        if (parsed.target == "chrome")
+        AppLauncher::Open(parsed.target);
+    }
+
+    else if (parsed.action == "create")
+    {
+        if (parsed.target == "folder")
         {
-            system("start chrome");
-        }
-        else if (parsed.target == "calculator")
-        {
-            system("start calc");
-        }
-        else if (parsed.target == "notepad")
-        {
-            system("start notepad");
-        }
-        else if (parsed.target == "youtube")
-        {
-            system("start https://youtube.com");
+            FileManager::CreateFolder(parsed.argument);
         }
         else
         {
-            std::cout << "Unknown application\n";
+            std::cout << "Unknown create command\n";
         }
     }
 
+    else if (parsed.action == "delete")
+    {
+        if (parsed.target == "folder")
+        {
+            FileManager::DeleteFolder(parsed.argument);
+        }
+        else if (parsed.action == "create")
+        {
+            if (parsed.target == "folder")
+            {
+                FileManager::CreateFolder(parsed.argument);
+            }
+            else if (parsed.target == "file")
+            {
+                FileManager::CreateFile(parsed.argument);
+            }
+        }
+        else if (parsed.action == "delete")
+        {
+            if (parsed.target == "folder")
+            {
+                FileManager::DeleteFolder(parsed.argument);
+            }
+            else if (parsed.target == "file")
+            {
+                FileManager::DeleteFile(parsed.argument);
+            }
+        }
+    }
     else if (command == "exit")
     {
         std::cout << "Goodbye!\n";

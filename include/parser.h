@@ -6,6 +6,7 @@ struct ParsedCommand
 {
     std::string action;
     std::string target;
+    std::string argument;
 };
 
 class Parser
