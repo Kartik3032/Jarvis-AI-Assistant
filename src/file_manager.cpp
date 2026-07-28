@@ -53,3 +53,17 @@ void FileManager::DeleteFile(const std::string &fileName)
         std::cout << "File Not Found\n";
     }
 }
+void FileManager::Rename(const std::string &oldName,
+                         const std::string &newName)
+{
+    std::filesystem::rename(oldName, newName);
+
+    std::cout << "Renamed Successfully\n";
+}
+void FileManager::ListFiles()
+{
+    for (const auto &entry : std::filesystem::directory_iterator("."))
+    {
+        std::cout << entry.path().filename().string() << '\n';
+    }
+}

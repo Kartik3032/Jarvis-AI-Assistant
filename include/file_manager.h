@@ -9,4 +9,7 @@ public:
     static void DeleteFolder(const std::string &folderName);
     static void CreateFile(const std::string &fileName);
     static void DeleteFile(const std::string &fileName);
+    static void Rename(const std::string &oldName,
+                       const std::string &newName);
+    static void ListFiles();
 };

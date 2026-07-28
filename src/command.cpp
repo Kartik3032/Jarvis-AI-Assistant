@@ -129,7 +129,19 @@ bool Command::ProcessCommand(const std::string &command)
                 FileManager::DeleteFile(parsed.argument);
             }
         }
-    }
+        else if (parsed.action == "rename")
+        {
+            FileManager::Rename(parsed.argument,
+                                parsed.argument2);
+        }
+        else if (parsed.action == "list")
+        {
+            if (parsed.target == "files")
+            {
+                FileManager::ListFiles();
+            }
+        }
+        }
     else if (command == "exit")
     {
         std::cout << "Goodbye!\n";
