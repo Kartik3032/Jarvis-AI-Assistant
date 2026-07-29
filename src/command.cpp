@@ -7,6 +7,7 @@
 #include "../include/parser.h"
 #include "../include/app_launcher.h"
 #include "../include/file_manager.h"
+#include "../include/system_manager.h"
 
 std::string Command::GetCommand()
 {
@@ -141,7 +142,12 @@ bool Command::ProcessCommand(const std::string &command)
                 FileManager::ListFiles();
             }
         }
-        }
+    }
+    else if (parsed.action == "system" &&
+             parsed.target == "info")
+    {
+        SystemManager::SystemInfo();
+    }
     else if (command == "exit")
     {
         std::cout << "Goodbye!\n";
@@ -153,5 +159,5 @@ bool Command::ProcessCommand(const std::string &command)
         std::cout << "Unknown Command\n";
     }
 
-    return true;
+        return true;
 }
