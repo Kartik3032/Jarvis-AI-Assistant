@@ -14,6 +14,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
     src/app_launcher.cpp
     src/file_manager.cpp
     src/system_manager.cpp
+    src/web_manager.cpp
 
 )
 

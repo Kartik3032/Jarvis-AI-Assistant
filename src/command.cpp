@@ -8,6 +8,7 @@
 #include "../include/app_launcher.h"
 #include "../include/file_manager.h"
 #include "../include/system_manager.h"
+#include "../include/web_manager.h"
 
 std::string Command::GetCommand()
 {
@@ -148,6 +149,46 @@ bool Command::ProcessCommand(const std::string &command)
     {
         SystemManager::SystemInfo();
     }
+
+    else if (parsed.action == "google")
+    {
+        WebManager::GoogleSearch(parsed.target);
+    }
+
+    else if (parsed.action == "youtube")
+    {
+        WebManager::YouTubeSearch(parsed.target);
+    }
+
+    else if (parsed.action == "github")
+    {
+        WebManager::GitHubSearch(parsed.target);
+    }
+
+    else if (command == "chatgpt")
+    {
+        WebManager::OpenChatGPT();
+    }
+
+    else if (command == "gmail")
+    {
+        WebManager::OpenGmail();
+    }
+
+    else if (command == "google")
+    {
+        WebManager::OpenGoogle();
+    }
+
+    else if (command == "youtube")
+    {
+        WebManager::OpenYouTube();
+    }
+
+    else if (command == "github")
+    {
+        WebManager::OpenGitHub();
+    }
     else if (command == "exit")
     {
         std::cout << "Goodbye!\n";
@@ -159,5 +200,5 @@ bool Command::ProcessCommand(const std::string &command)
         std::cout << "Unknown Command\n";
     }
 
-        return true;
+    return true;
 }

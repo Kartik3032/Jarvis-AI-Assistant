@@ -4,10 +4,18 @@ A production-level AI voice assistant built in Modern C++.
 
 ## Features
 
-- Voice Commands
-- Gemini API
-- Speech Recognition
-- Text-to-Speech
-- System Automation
+## Features
+
+- Logger
+- Config Manager
+- Command Engine
+- Parser
+- App Launcher
+- File Manager
+- System Manager
+  - System Information
+  - CPU Information
+  - RAM Information
+  - Battery Status
 
 Author: Kartik Chavan
