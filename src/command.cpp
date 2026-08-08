@@ -15,6 +15,7 @@
 #include "../include/weather_manager.h"
 #include "../include/news_manager.h"
 #include "../include/battery_manager.h"
+#include "../include/volume_manager.h"
 
 std::string Command::GetCommand()
 {
@@ -283,6 +284,20 @@ bool Command::ProcessCommand(const std::string &command)
     else if (command == "battery")
     {
         BatteryManager::ShowBattery();
+    }
+    else if (command == "volume up")
+    {
+        VolumeManager::VolumeUp();
+    }
+
+    else if (command == "volume down")
+    {
+        VolumeManager::VolumeDown();
+    }
+
+    else if (command == "mute")
+    {
+        VolumeManager::Mute();
     }
 
     else if (command == "exit")
