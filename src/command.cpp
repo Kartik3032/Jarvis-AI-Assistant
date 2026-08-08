@@ -12,6 +12,7 @@
 #include "../include/calculator.h"
 #include "../include/notes_manager.h"
 #include "../include/reminder_manager.h"
+#include "../include/weather_manager.h"
 
 std::string Command::GetCommand()
 {
@@ -269,7 +270,10 @@ bool Command::ProcessCommand(const std::string &command)
     {
         ReminderManager::ShowReminders();
     }
-
+    else if (parsed.action == "weather")
+    {
+        WeatherManager::GetWeather(parsed.target);
+    }
     // EXIT
     else if (command == "exit")
     {
