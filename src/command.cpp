@@ -10,6 +10,7 @@
 #include "../include/system_manager.h"
 #include "../include/web_manager.h"
 #include "../include/calculator.h"
+#include "../include/notes_manager.h"
 
 std::string Command::GetCommand()
 {
@@ -201,6 +202,15 @@ bool Command::ProcessCommand(const std::string &command)
             parsed.target + " " +
             parsed.argument + " " +
             parsed.argument2);
+    }
+    else if (parsed.action == "note")
+    {
+        NotesManager::AddNote(parsed.target + " " + parsed.argument);
+    }
+
+    else if (command == "notes")
+    {
+        NotesManager::ShowNotes();
     }
     else
     {
