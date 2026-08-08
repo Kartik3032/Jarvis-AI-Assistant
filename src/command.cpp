@@ -13,6 +13,7 @@
 #include "../include/notes_manager.h"
 #include "../include/reminder_manager.h"
 #include "../include/weather_manager.h"
+#include "../include/news_manager.h"
 
 std::string Command::GetCommand()
 {
@@ -273,6 +274,10 @@ bool Command::ProcessCommand(const std::string &command)
     else if (parsed.action == "weather")
     {
         WeatherManager::GetWeather(parsed.target);
+    }
+    else if (command == "news")
+    {
+        NewsManager::GetNews();
     }
     // EXIT
     else if (command == "exit")
