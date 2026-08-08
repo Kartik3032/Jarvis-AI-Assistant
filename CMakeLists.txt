@@ -15,6 +15,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
     src/file_manager.cpp
     src/system_manager.cpp
     src/web_manager.cpp
+    src/calculator.cpp
 
 )
 

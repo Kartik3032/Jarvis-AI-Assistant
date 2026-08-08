@@ -9,6 +9,7 @@
 #include "../include/file_manager.h"
 #include "../include/system_manager.h"
 #include "../include/web_manager.h"
+#include "../include/calculator.h"
 
 std::string Command::GetCommand()
 {
@@ -194,7 +195,13 @@ bool Command::ProcessCommand(const std::string &command)
         std::cout << "Goodbye!\n";
         return false;
     }
-
+    else if (parsed.action == "calculate")
+    {
+        Calculator::Calculate(
+            parsed.target + " " +
+            parsed.argument + " " +
+            parsed.argument2);
+    }
     else
     {
         std::cout << "Unknown Command\n";
