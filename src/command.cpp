@@ -14,6 +14,7 @@
 #include "../include/reminder_manager.h"
 #include "../include/weather_manager.h"
 #include "../include/news_manager.h"
+#include "../include/battery_manager.h"
 
 std::string Command::GetCommand()
 {
@@ -279,7 +280,11 @@ bool Command::ProcessCommand(const std::string &command)
     {
         NewsManager::GetNews();
     }
-    // EXIT
+    else if (command == "battery")
+    {
+        BatteryManager::ShowBattery();
+    }
+
     else if (command == "exit")
     {
         std::cout << "Goodbye!\n";

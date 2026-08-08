@@ -20,6 +20,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
     src/reminder_manager.cpp
     src/weather_manager.cpp
     src/news_manager.cpp
+    src/battery_manager.cpp
 )
 
 target_include_directories(JarvisAI PRIVATE include)
