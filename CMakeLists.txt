@@ -17,7 +17,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
     src/web_manager.cpp
     src/calculator.cpp
     src/notes_manager.cpp
-
+    src/reminder_manager.cpp
 )
 
 target_include_directories(JarvisAI PRIVATE include)
