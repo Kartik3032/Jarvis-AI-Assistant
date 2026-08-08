@@ -22,6 +22,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
     src/news_manager.cpp
     src/battery_manager.cpp
     src/volume_manager.cpp
+    src/music_manager.cpp
 )
 
 target_include_directories(JarvisAI PRIVATE include)

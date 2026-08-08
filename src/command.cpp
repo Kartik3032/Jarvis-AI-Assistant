@@ -16,6 +16,7 @@
 #include "../include/news_manager.h"
 #include "../include/battery_manager.h"
 #include "../include/volume_manager.h"
+#include "../include/music_manager.h"
 
 std::string Command::GetCommand()
 {
@@ -298,6 +299,25 @@ bool Command::ProcessCommand(const std::string &command)
     else if (command == "mute")
     {
         VolumeManager::Mute();
+    }
+    else if (parsed.action == "play")
+    {
+        MusicManager::Play(parsed.target);
+    }
+
+    else if (command == "pause")
+    {
+        MusicManager::Pause();
+    }
+
+    else if (command == "resume")
+    {
+        MusicManager::Resume();
+    }
+
+    else if (command == "stop")
+    {
+        MusicManager::Stop();
     }
 
     else if (command == "exit")
