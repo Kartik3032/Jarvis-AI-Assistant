@@ -79,7 +79,7 @@ target_include_directories(JarvisAI PRIVATE
 # ==========================================
 
 target_link_libraries(JarvisAI PRIVATE
-
+winhttp
     whisper
 
     SDL2::SDL2

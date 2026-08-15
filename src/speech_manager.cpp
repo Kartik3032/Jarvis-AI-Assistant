@@ -16,10 +16,9 @@ std::string SpeechManager::Listen()
     std::cout << "=================================\n";
     std::cout << "Speak now...\n";
 
-    // Initialize SDL audio
     if (SDL_Init(SDL_INIT_AUDIO) != 0)
     {
-        std::cout << "SDL audio initialization failed: "
+        std::cout << "SDL initialization failed: "
                   << SDL_GetError() << "\n";
         return "";
     }
@@ -28,7 +27,7 @@ std::string SpeechManager::Listen()
     SDL_AudioSpec have{};
 
     want.freq = 16000;
-    want.format = AUDIO_S16LSB;
+    want.format = AUDIO_F32SYS;
     want.channels = 1;
     want.samples = 4096;
     want.callback = nullptr;
@@ -43,7 +42,7 @@ std::string SpeechManager::Listen()
 
     if (device == 0)
     {
-        std::cout << "Unable to open microphone: "
+        std::cout << "Microphone error: "
                   << SDL_GetError() << "\n";
 
         SDL_Quit();
@@ -51,179 +50,116 @@ std::string SpeechManager::Listen()
     }
 
     std::cout << "Microphone connected.\n";
-
     std::cout << "Actual mic format: "
               << have.freq
               << " Hz, "
               << static_cast<int>(have.channels)
               << " channel(s)\n";
 
-    std::cout << "Listening for 5 seconds...\n";
+    // Give microphone a moment to initialize
+    SDL_Delay(300);
 
     SDL_PauseAudioDevice(device, 0);
 
-    // SDL stream converts microphone audio
-    // into Whisper's required format:
-    // 16 kHz, mono, float
-    SDL_AudioStream *stream =
-        SDL_NewAudioStream(
-            have.format,
-            have.channels,
-            have.freq,
-            AUDIO_F32SYS,
-            1,
-            16000);
-
-    if (stream == nullptr)
-    {
-        std::cout << "Unable to create audio converter: "
-                  << SDL_GetError() << "\n";
-
-        SDL_CloseAudioDevice(device);
-        SDL_Quit();
-        return "";
-    }
+    constexpr int RECORD_SECONDS = 6;
+    constexpr int SAMPLE_RATE = 16000;
 
     std::vector<float> audio;
-    audio.reserve(16000 * 5);
+    audio.reserve(SAMPLE_RATE * RECORD_SECONDS);
+
+    std::cout << "Listening for "
+              << RECORD_SECONDS
+              << " seconds...\n";
 
     const Uint32 start = SDL_GetTicks();
 
-    while (SDL_GetTicks() - start < 5000)
+    while (SDL_GetTicks() - start <
+           RECORD_SECONDS * 1000)
     {
         Uint32 queued =
             SDL_GetQueuedAudioSize(device);
 
         if (queued > 0)
         {
-            std::vector<Uint8> buffer(queued);
+            Uint32 bytesPerSample =
+                sizeof(float);
 
-            SDL_DequeueAudio(
-                device,
-                buffer.data(),
-                queued);
+            Uint32 samples =
+                queued / bytesPerSample;
 
-            // Send raw microphone data
-            // into SDL converter
-            if (SDL_AudioStreamPut(
-                    stream,
+            std::vector<float> buffer(samples);
+
+            Uint32 received =
+                SDL_DequeueAudio(
+                    device,
                     buffer.data(),
-                    static_cast<int>(queued)) != 0)
-            {
-                std::cout << "Audio stream error: "
-                          << SDL_GetError() << "\n";
-            }
+                    queued);
 
-            // Get converted float samples
-            int available =
-                SDL_AudioStreamAvailable(stream);
+            Uint32 receivedSamples =
+                received / bytesPerSample;
 
-            if (available > 0)
-            {
-                int floatSamples =
-                    available / sizeof(float);
-
-                std::vector<float> converted(
-                    floatSamples);
-
-                int received =
-                    SDL_AudioStreamGet(
-                        stream,
-                        converted.data(),
-                        available);
-
-                if (received > 0)
-                {
-                    int samplesReceived =
-                        received / sizeof(float);
-
-                    audio.insert(
-                        audio.end(),
-                        converted.begin(),
-                        converted.begin() + samplesReceived);
-                }
-            }
+            audio.insert(
+                audio.end(),
+                buffer.begin(),
+                buffer.begin() + receivedSamples);
         }
 
         SDL_Delay(10);
     }
 
-    // Flush remaining converted audio
-    SDL_AudioStreamFlush(stream);
-
-    int available =
-        SDL_AudioStreamAvailable(stream);
-
-    if (available > 0)
-    {
-        int floatSamples =
-            available / sizeof(float);
-
-        std::vector<float> converted(
-            floatSamples);
-
-        int received =
-            SDL_AudioStreamGet(
-                stream,
-                converted.data(),
-                available);
-
-        if (received > 0)
-        {
-            int samplesReceived =
-                received / sizeof(float);
-
-            audio.insert(
-                audio.end(),
-                converted.begin(),
-                converted.begin() + samplesReceived);
-        }
-    }
-
-    SDL_FreeAudioStream(stream);
     SDL_ClearQueuedAudio(device);
     SDL_CloseAudioDevice(device);
     SDL_Quit();
 
+    // --------------------------------
+    // Check whether microphone actually
+    // captured meaningful audio
+    // --------------------------------
+
     if (audio.empty())
     {
-        std::cout << "No audio captured.\n";
+        std::cout
+            << "No audio captured.\n";
+
         return "";
     }
 
-    std::cout << "Audio captured: "
-              << audio.size()
-              << " samples.\n";
-
-    // Mic volume diagnostics
     float maxAmplitude = 0.0f;
-    double sumSquares = 0.0;
 
     for (float sample : audio)
     {
-        maxAmplitude =
-            std::max(
-                maxAmplitude,
-                std::abs(sample));
+        float value =
+            std::abs(sample);
 
-        sumSquares +=
-            sample * sample;
+        if (value > maxAmplitude)
+            maxAmplitude = value;
     }
 
-    double rms =
-        std::sqrt(
-            sumSquares /
-            audio.size());
+    std::cout
+        << "Audio captured: "
+        << audio.size()
+        << " samples\n";
 
-    std::cout << "Mic Peak: "
-              << maxAmplitude
-              << "\n";
+    std::cout
+        << "Maximum audio level: "
+        << maxAmplitude
+        << "\n";
 
-    std::cout << "Mic RMS: "
-              << rms
-              << "\n";
+    // Very quiet microphone = don't send
+    // garbage to Whisper
+    if (maxAmplitude < 0.01f)
+    {
+        std::cout
+            << "Audio level too low. "
+            << "Please speak closer to the microphone.\n";
 
-    // Load Whisper model
+        return "";
+    }
+
+    // --------------------------------
+    // Whisper
+    // --------------------------------
+
     const char *modelPath =
         "third_party/whisper.cpp/ggml-base.en.bin";
 
@@ -239,10 +175,10 @@ std::string SpeechManager::Listen()
     {
         std::cout
             << "Failed to load Whisper model.\n";
+
         return "";
     }
 
-    // Whisper parameters
     whisper_full_params params =
         whisper_full_default_params(
             WHISPER_SAMPLING_GREEDY);
@@ -254,6 +190,7 @@ std::string SpeechManager::Listen()
 
     params.translate = false;
     params.language = "en";
+
     params.n_threads = 4;
 
     std::cout << "Transcribing...\n";
@@ -276,7 +213,7 @@ std::string SpeechManager::Listen()
 
     std::string text;
 
-    const int segments =
+    int segments =
         whisper_full_n_segments(ctx);
 
     for (int i = 0; i < segments; ++i)
@@ -287,14 +224,15 @@ std::string SpeechManager::Listen()
                 i);
 
         if (segment)
-        {
             text += segment;
-        }
     }
 
     whisper_free(ctx);
 
-    // Remove leading/trailing spaces
+    // --------------------------------
+    // Trim
+    // --------------------------------
+
     const size_t first =
         text.find_first_not_of(
             " \t\n\r");
@@ -315,9 +253,23 @@ std::string SpeechManager::Listen()
         text.clear();
     }
 
-    std::cout << "\nYou said: "
-              << text
-              << "\n";
+    // --------------------------------
+    // Reject Whisper garbage
+    // --------------------------------
+
+    if (text.empty())
+        return "";
+
+    if (text == "[BLANK_AUDIO]" ||
+        text == "[BLANK AUDIO]")
+    {
+        return "";
+    }
+
+    std::cout
+        << "\nYou said: "
+        << text
+        << "\n";
 
     return text;
 }

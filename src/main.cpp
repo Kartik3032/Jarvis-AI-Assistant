@@ -89,8 +89,6 @@ int main()
     // Shutdown
     // -----------------------------
 
-    SpeechManager::Shutdown();
-
     Logger::Log(
         "Jarvis Stopped",
         LogLevel::INFO);

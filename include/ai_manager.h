@@ -6,6 +6,7 @@ class AIManager
 {
 public:
     static bool Initialize();
-    static std::string Chat(const std::string &message);
-    static void ClearHistory();
+
+    static std::string Ask(
+        const std::string &prompt);
 };
