@@ -60,6 +60,7 @@ add_executable(JarvisAI
 
     src/tts_manager.cpp
     src/speech_manager.cpp
+    src/ai_manager.cpp
 )
 
 # ==========================================

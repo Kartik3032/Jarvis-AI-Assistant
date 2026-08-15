@@ -3,33 +3,24 @@
 #include "../include/logger.h"
 #include "../include/config.h"
 #include "../include/command.h"
-#include "../include/parser.h"
-
-#include <windows.h>
-#undef ERROR
+#include "../include/speech_manager.h"
+#include "../include/ai_manager.h"
 
 int main()
 {
+    // -----------------------------
+    // Startup
+    // -----------------------------
 
-    Logger::Log("Jarvis Started");
+    Logger::Log(
+        "Jarvis Started",
+        LogLevel::INFO);
+
+    Config::Load();
 
     Logger::Log(
         "Configuration Loaded",
         LogLevel::DEBUG);
-
-    Logger::Log(
-        "Microphone Connected",
-        LogLevel::INFO);
-
-    Logger::Log(
-        "Low Battery",
-        LogLevel::WARNING);
-
-    Logger::Log(
-        "Internet Connection Lost",
-        LogLevel::ERROR);
-
-    Config::Load();
 
     Logger::Log(
         "Assistant Name : " +
@@ -43,18 +34,66 @@ int main()
         "Voice : " +
         Config::GetVoice());
 
-    Logger::Log(
-        "Jarvis Started",
-        LogLevel::INFO);
+    // -----------------------------
+    // Speech Initialization
+    // -----------------------------
+
+    if (!SpeechManager::Initialize())
+    {
+        Logger::Log(
+            "Speech initialization failed",
+            LogLevel::ERROR);
+
+        return 1;
+    }
+
+    // -----------------------------
+    // AI Initialization
+    // -----------------------------
+
+    AIManager::Initialize();
+
+    std::cout
+        << "\n=================================\n"
+        << "          JARVIS READY\n"
+        << "=================================\n"
+        << "Speak naturally.\n"
+        << "Say goodbye to exit.\n\n";
+
+    // -----------------------------
+    // Main Loop
+    // -----------------------------
 
     bool running = true;
 
     while (running)
     {
-        std::string cmd = Command::GetCommand();
+        std::string cmd = SpeechManager::Listen();
 
+        // Ignore empty / blank audio
+        if (cmd.empty() || cmd == "[BLANK_AUDIO]")
+        {
+            continue;
+        }
+
+        std::cout
+            << "\nRecognized Text: "
+            << cmd
+            << "\n";
+
+        // Send recognized speech to command processor
         running = Command::ProcessCommand(cmd);
     }
+
+    // -----------------------------
+    // Shutdown
+    // -----------------------------
+
+    SpeechManager::Shutdown();
+
+    Logger::Log(
+        "Jarvis Stopped",
+        LogLevel::INFO);
 
     return 0;
 }

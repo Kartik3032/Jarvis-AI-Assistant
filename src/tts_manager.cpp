@@ -1,21 +1,25 @@
 #include "../include/tts_manager.h"
 
-#include <windows.h>
-#include <sapi.h>
 #include <iostream>
 #include <string>
+#include <windows.h>
+#include <sapi.h>
 
 #pragma comment(lib, "sapi.lib")
 
 void TTSManager::Speak(const std::string &text)
 {
-    // Initialize COM
-    HRESULT comHr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+    HRESULT comHr = CoInitialize(nullptr);
 
     if (FAILED(comHr) && comHr != RPC_E_CHANGED_MODE)
     {
-        std::cout << "Unable to initialize COM. HRESULT = 0x"
-                  << std::hex << comHr << std::dec << std::endl;
+        std::cout
+            << "COM initialization failed. HRESULT = 0x"
+            << std::hex
+            << comHr
+            << std::dec
+            << "\n";
+
         return;
     }
 
@@ -30,13 +34,15 @@ void TTSManager::Speak(const std::string &text)
 
     if (FAILED(hr))
     {
-        std::cout << "Unable to initialize voice system. HRESULT = 0x"
-                  << std::hex << hr << std::dec << std::endl;
+        std::cout
+            << "Unable to initialize voice system. HRESULT = 0x"
+            << std::hex
+            << hr
+            << std::dec
+            << "\n";
 
         if (comHr != RPC_E_CHANGED_MODE)
-        {
             CoUninitialize();
-        }
 
         return;
     }
@@ -54,9 +60,7 @@ void TTSManager::Speak(const std::string &text)
         voice->Release();
 
         if (comHr != RPC_E_CHANGED_MODE)
-        {
             CoUninitialize();
-        }
 
         return;
     }
@@ -71,21 +75,13 @@ void TTSManager::Speak(const std::string &text)
         wideText.data(),
         sizeNeeded);
 
-    HRESULT speakHr = voice->Speak(
+    voice->Speak(
         wideText.c_str(),
         SPF_DEFAULT,
         nullptr);
 
-    if (FAILED(speakHr))
-    {
-        std::cout << "Voice Speak failed. HRESULT = 0x"
-                  << std::hex << speakHr << std::dec << std::endl;
-    }
-
     voice->Release();
 
     if (comHr != RPC_E_CHANGED_MODE)
-    {
         CoUninitialize();
-    }
 }
