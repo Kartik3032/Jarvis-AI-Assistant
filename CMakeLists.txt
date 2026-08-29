@@ -1,10 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(JarvisAI VERSION 1.0 LANGUAGES CXX)
+project(JarvisAI VERSION 1.0)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 # ==========================================
 # Whisper.cpp options
@@ -19,9 +18,7 @@ set(WHISPER_SDL2 ON CACHE BOOL "" FORCE)
 # SDL2
 # ==========================================
 
-set(SDL2_DIR
-    "C:/SDL2/SDL2-2.30.8/cmake"
-)
+set(SDL2_DIR "C:/SDL2/SDL2-2.30.8/cmake")
 
 find_package(SDL2 CONFIG REQUIRED)
 
@@ -29,12 +26,10 @@ find_package(SDL2 CONFIG REQUIRED)
 # Whisper.cpp
 # ==========================================
 
-add_subdirectory(
-    third_party/whisper.cpp
-)
+add_subdirectory(third_party/whisper.cpp)
 
 # ==========================================
-# Jarvis AI Sources
+# JARVIS AI
 # ==========================================
 
 add_executable(JarvisAI
@@ -49,28 +44,26 @@ add_executable(JarvisAI
 
     # System
     src/app_launcher.cpp
-    src/system_manager.cpp
-    src/battery_manager.cpp
-    src/volume_manager.cpp
-
-    # Files
     src/file_manager.cpp
-    src/notes_manager.cpp
-    src/reminder_manager.cpp
-
-    # Web / Information
+    src/system_manager.cpp
     src/web_manager.cpp
-    src/weather_manager.cpp
-    src/news_manager.cpp
 
     # Utilities
     src/calculator.cpp
+    src/notes_manager.cpp
+    src/reminder_manager.cpp
+
+    # Information
+    src/weather_manager.cpp
+    src/news_manager.cpp
+    src/battery_manager.cpp
 
     # Media
+    src/volume_manager.cpp
     src/music_manager.cpp
-    src/tts_manager.cpp
 
-    # Voice / AI
+    # AI / Voice
+    src/tts_manager.cpp
     src/speech_manager.cpp
     src/ai_manager.cpp
 
@@ -79,18 +72,18 @@ add_executable(JarvisAI
 )
 
 # ==========================================
-# Include directories
+# INCLUDE DIRECTORIES
 # ==========================================
 
 target_include_directories(JarvisAI PRIVATE
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    include
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/whisper.cpp/include
+    third_party/whisper.cpp/include
 )
 
 # ==========================================
-# Libraries
+# LIBRARIES
 # ==========================================
 
 target_link_libraries(JarvisAI PRIVATE
@@ -101,59 +94,7 @@ target_link_libraries(JarvisAI PRIVATE
 
     winhttp
 
-    winmm
+    ws2_32
 
-    ole32
-
-    shell32
-
-    user32
-
-    advapi32
+    sapi
 )
-
-# ==========================================
-# Windows
-# ==========================================
-
-if(WIN32)
-
-    target_compile_definitions(
-        JarvisAI
-        PRIVATE
-        WIN32_LEAN_AND_MEAN
-    )
-
-endif()
-
-# ==========================================
-# Output directory
-# ==========================================
-
-set_target_properties(
-    JarvisAI
-    PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY
-    "${CMAKE_BINARY_DIR}/Release"
-)
-
-# ==========================================
-# Copy SDL2 DLL beside executable
-# ==========================================
-
-if(WIN32)
-
-    add_custom_command(
-        TARGET JarvisAI
-        POST_BUILD
-
-        COMMAND
-        ${CMAKE_COMMAND}
-        -E copy_if_different
-
-        "$<TARGET_FILE:SDL2::SDL2>"
-
-        "$<TARGET_FILE_DIR:JarvisAI>"
-    )
-
-endif()

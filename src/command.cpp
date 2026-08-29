@@ -18,6 +18,18 @@
 #include <windows.h>
 #include <shellapi.h>
 
+// IMPORTANT:
+// Windows defines CreateFile and DeleteFile as macros.
+// They conflict with FileManager::CreateFile()
+// and FileManager::DeleteFile().
+#ifdef CreateFile
+#undef CreateFile
+#endif
+
+#ifdef DeleteFile
+#undef DeleteFile
+#endif
+
 #include <algorithm>
 #include <cctype>
 #include <iostream>
@@ -27,6 +39,10 @@
 
 namespace
 {
+    // ==========================================
+    // LOWERCASE
+    // ==========================================
+
     std::string Lower(std::string text)
     {
         std::transform(
@@ -42,14 +58,23 @@ namespace
         return text;
     }
 
+    // ==========================================
+    // TEXT TO SPEECH
+    // ==========================================
+
     void Speak(const std::string &text)
     {
-        std::cout << "Jarvis: "
-                  << text
-                  << "\n";
+        std::cout
+            << "Jarvis: "
+            << text
+            << "\n";
 
         TTSManager::Speak(text);
     }
+
+    // ==========================================
+    // GET TEXT AFTER PREFIX
+    // ==========================================
 
     std::string After(
         const std::string &text,
@@ -61,6 +86,10 @@ namespace
         return text.substr(prefix.size());
     }
 
+    // ==========================================
+    // OPEN WINDOWS FOLDER
+    // ==========================================
+
     void OpenFolder(const char *folder)
     {
         ShellExecuteA(
@@ -71,6 +100,10 @@ namespace
             nullptr,
             SW_SHOWNORMAL);
     }
+
+    // ==========================================
+    // MAKE CALCULATOR EXPRESSION
+    // ==========================================
 
     std::string MakeExpression(
         std::string text)
@@ -89,11 +122,12 @@ namespace
             {
                 text =
                     text.substr(prefix.size());
+
                 break;
             }
         }
 
-        // Natural speech -> operators
+        // Natural language -> operators
 
         const std::string replacements[][2] =
             {
@@ -110,7 +144,9 @@ namespace
             size_t pos = 0;
 
             while (
-                (pos = text.find(r[0], pos)) != std::string::npos)
+                (pos = text.find(
+                     r[0],
+                     pos)) != std::string::npos)
             {
                 text.replace(
                     pos,
@@ -125,13 +161,18 @@ namespace
     }
 }
 
+// ==========================================
+// COMMAND PROCESSOR
+// ==========================================
+
 bool Command::ProcessCommand(
     const std::string &input)
 {
     if (input.empty())
         return true;
 
-    std::string cmd = Lower(input);
+    std::string cmd =
+        Lower(input);
 
     std::cout
         << "\n=================================\n"
@@ -141,30 +182,34 @@ bool Command::ProcessCommand(
         << input
         << "\n";
 
-    // =================================
+    // ==========================================
     // EXIT
-    // =================================
+    // ==========================================
 
     if (cmd == "goodbye" ||
         cmd == "exit" ||
         cmd == "quit" ||
         cmd == "shutdown" ||
-        cmd.find("stop jarvis") != std::string::npos)
+        cmd.find("stop jarvis") !=
+            std::string::npos)
     {
-        Speak("Goodbye. See you later.");
+        Speak(
+            "Goodbye. See you later.");
 
         return false;
     }
 
-    // =================================
+    // ==========================================
     // GREETING
-    // =================================
+    // ==========================================
 
     if (cmd == "hello" ||
         cmd == "hi" ||
         cmd == "hey" ||
-        cmd.find("hello jarvis") != std::string::npos ||
-        cmd.find("hey jarvis") != std::string::npos)
+        cmd.find("hello jarvis") !=
+            std::string::npos ||
+        cmd.find("hey jarvis") !=
+            std::string::npos)
     {
         Speak(
             "Hello! How can I help you?");
@@ -172,12 +217,13 @@ bool Command::ProcessCommand(
         return true;
     }
 
-    // =================================
+    // ==========================================
     // HELP
-    // =================================
+    // ==========================================
 
     if (cmd == "help" ||
-        cmd.find("what can you do") != std::string::npos)
+        cmd.find("what can you do") !=
+            std::string::npos)
     {
         Speak(
             "I can calculate, check weather, "
@@ -190,15 +236,18 @@ bool Command::ProcessCommand(
         return true;
     }
 
-    // =================================
+    // ==========================================
     // TIME
-    // =================================
+    // ==========================================
 
-    if (cmd.find("what time") != std::string::npos ||
+    if (cmd.find("what time") !=
+            std::string::npos ||
         cmd == "time" ||
-        cmd.find("current time") != std::string::npos)
+        cmd.find("current time") !=
+            std::string::npos)
     {
         SYSTEMTIME now;
+
         GetLocalTime(&now);
 
         char timeText[32];
@@ -216,9 +265,9 @@ bool Command::ProcessCommand(
         return true;
     }
 
-    // =================================
+    // ==========================================
     // CALCULATOR
-    // =================================
+    // ==========================================
 
     if (cmd.find("calculate") == 0 ||
         cmd.find("what is ") == 0 ||
@@ -227,27 +276,31 @@ bool Command::ProcessCommand(
         std::string expression =
             MakeExpression(input);
 
-        Calculator::Calculate(expression);
+        Calculator::Calculate(
+            expression);
 
-        Speak("Calculation completed.");
+        Speak(
+            "Calculation completed.");
 
         return true;
     }
 
-    // =================================
+    // ==========================================
     // WEATHER
-    // =================================
+    // ==========================================
 
     if (cmd.find("weather") !=
         std::string::npos)
     {
-        std::string city = "Mumbai";
+        std::string city =
+            "Mumbai";
 
         size_t weatherPos =
             cmd.find("weather");
 
         std::string remaining =
-            cmd.substr(weatherPos + 7);
+            cmd.substr(
+                weatherPos + 7);
 
         while (
             !remaining.empty() &&
@@ -257,18 +310,23 @@ bool Command::ProcessCommand(
         }
 
         if (remaining.find("in ") == 0)
+        {
             remaining =
                 remaining.substr(3);
+        }
 
         if (!remaining.empty())
+        {
             city = remaining;
+        }
 
         std::cout
             << "Checking weather for: "
             << city
             << "\n";
 
-        WeatherManager::GetWeather(city);
+        WeatherManager::GetWeather(
+            city);
 
         Speak(
             "I have checked the weather for " +
@@ -277,37 +335,39 @@ bool Command::ProcessCommand(
         return true;
     }
 
-    // =================================
+    // ==========================================
     // GOOGLE
-    // =================================
+    // ==========================================
 
     if (cmd == "google" ||
         cmd == "open google")
     {
         WebManager::OpenGoogle();
 
-        Speak("Opening Google.");
+        Speak(
+            "Opening Google.");
 
         return true;
     }
 
-    // =================================
+    // ==========================================
     // YOUTUBE
-    // =================================
+    // ==========================================
 
     if (cmd == "youtube" ||
         cmd == "open youtube")
     {
         WebManager::OpenYouTube();
 
-        Speak("Opening YouTube.");
+        Speak(
+            "Opening YouTube.");
 
         return true;
     }
 
-    // =================================
+    // ==========================================
     // YOUTUBE SEARCH
-    // =================================
+    // ==========================================
 
     if (cmd.find("search youtube ") == 0)
     {
@@ -316,7 +376,16 @@ bool Command::ProcessCommand(
                 cmd,
                 "search youtube ");
 
-        WebManager::YouTubeSearch(query);
+        if (query.empty())
+        {
+            Speak(
+                "Please tell me what to search on YouTube.");
+
+            return true;
+        }
+
+        WebManager::YouTubeSearch(
+            query);
 
         Speak(
             "Searching YouTube for " +
@@ -325,9 +394,9 @@ bool Command::ProcessCommand(
         return true;
     }
 
-    // =================================
+    // ==========================================
     // GOOGLE SEARCH
-    // =================================
+    // ==========================================
 
     if (cmd.find("search google ") == 0)
     {
@@ -336,7 +405,16 @@ bool Command::ProcessCommand(
                 cmd,
                 "search google ");
 
-        WebManager::GoogleSearch(query);
+        if (query.empty())
+        {
+            Speak(
+                "Please tell me what to search on Google.");
+
+            return true;
+        }
+
+        WebManager::GoogleSearch(
+            query);
 
         Speak(
             "Searching Google for " +
@@ -345,99 +423,106 @@ bool Command::ProcessCommand(
         return true;
     }
 
-    // =================================
+    // ==========================================
     // GITHUB
-    // =================================
+    // ==========================================
 
     if (cmd == "github" ||
         cmd == "open github")
     {
         WebManager::OpenGitHub();
 
-        Speak("Opening GitHub.");
+        Speak(
+            "Opening GitHub.");
 
         return true;
     }
 
-    // =================================
+    // ==========================================
     // CHATGPT
-    // =================================
+    // ==========================================
 
     if (cmd == "chatgpt" ||
         cmd == "open chatgpt")
     {
         WebManager::OpenChatGPT();
 
-        Speak("Opening ChatGPT.");
+        Speak(
+            "Opening ChatGPT.");
 
         return true;
     }
 
-    // =================================
+    // ==========================================
     // GMAIL
-    // =================================
+    // ==========================================
 
     if (cmd == "gmail" ||
         cmd == "open gmail")
     {
         WebManager::OpenGmail();
 
-        Speak("Opening Gmail.");
+        Speak(
+            "Opening Gmail.");
 
         return true;
     }
 
-    // =================================
+    // ==========================================
     // LINKEDIN
-    // =================================
+    // ==========================================
 
     if (cmd == "linkedin" ||
         cmd == "open linkedin")
     {
         WebManager::OpenLinkedIn();
 
-        Speak("Opening LinkedIn.");
+        Speak(
+            "Opening LinkedIn.");
 
         return true;
     }
 
-    // =================================
+    // ==========================================
     // LEETCODE
-    // =================================
+    // ==========================================
 
     if (cmd == "leetcode" ||
         cmd == "open leetcode")
     {
         WebManager::OpenLeetCode();
 
-        Speak("Opening LeetCode.");
+        Speak(
+            "Opening LeetCode.");
 
         return true;
     }
 
-    // =================================
+    // ==========================================
     // GEEKSFORGEEKS
-    // =================================
+    // ==========================================
 
     if (cmd == "geeksforgeeks" ||
         cmd == "open geeksforgeeks")
     {
         WebManager::OpenGeeksForGeeks();
 
-        Speak("Opening GeeksforGeeks.");
+        Speak(
+            "Opening GeeksforGeeks.");
 
         return true;
     }
 
-    // =================================
+    // ==========================================
     // FILE EXPLORER
-    // =================================
+    // ==========================================
 
     if (cmd == "open files" ||
         cmd == "open file explorer" ||
         cmd == "file explorer")
     {
-        OpenFolder("explorer.exe");
+        OpenFolder(
+            "explorer.exe");
 
         Speak(
             "Opening file explorer.");
@@ -445,29 +530,41 @@ bool Command::ProcessCommand(
         return true;
     }
 
-    // =================================
+    // ==========================================
     // LIST FILES
-    // =================================
+    // ==========================================
 
     if (cmd == "list files")
     {
         FileManager::ListFiles();
 
-        Speak("Here are your files.");
+        Speak(
+            "Here are your files.");
 
         return true;
     }
 
-    // =================================
+    // ==========================================
     // CREATE FILE
-    // =================================
+    // ==========================================
 
     if (cmd.find("create file ") == 0)
     {
         std::string name =
-            After(cmd, "create file ");
+            After(
+                cmd,
+                "create file ");
 
-        FileManager::CreateFile(name);
+        if (name.empty())
+        {
+            Speak(
+                "Please provide a file name.");
+
+            return true;
+        }
+
+        FileManager::CreateFile(
+            name);
 
         Speak(
             "File creation requested.");
@@ -475,16 +572,27 @@ bool Command::ProcessCommand(
         return true;
     }
 
-    // =================================
+    // ==========================================
     // CREATE FOLDER
-    // =================================
+    // ==========================================
 
     if (cmd.find("create folder ") == 0)
     {
         std::string name =
-            After(cmd, "create folder ");
+            After(
+                cmd,
+                "create folder ");
 
-        FileManager::CreateFolder(name);
+        if (name.empty())
+        {
+            Speak(
+                "Please provide a folder name.");
+
+            return true;
+        }
+
+        FileManager::CreateFolder(
+            name);
 
         Speak(
             "Folder creation requested.");
@@ -492,16 +600,27 @@ bool Command::ProcessCommand(
         return true;
     }
 
-    // =================================
+    // ==========================================
     // DELETE FILE
-    // =================================
+    // ==========================================
 
     if (cmd.find("delete file ") == 0)
     {
         std::string name =
-            After(cmd, "delete file ");
+            After(
+                cmd,
+                "delete file ");
 
-        FileManager::DeleteFile(name);
+        if (name.empty())
+        {
+            Speak(
+                "Please provide a file name.");
+
+            return true;
+        }
+
+        FileManager::DeleteFile(
+            name);
 
         Speak(
             "File deletion requested.");
@@ -509,14 +628,93 @@ bool Command::ProcessCommand(
         return true;
     }
 
-    // =================================
+    // ==========================================
+    // DELETE FOLDER
+    // ==========================================
+
+    if (cmd.find("delete folder ") == 0)
+    {
+        std::string name =
+            After(
+                cmd,
+                "delete folder ");
+
+        if (name.empty())
+        {
+            Speak(
+                "Please provide a folder name.");
+
+            return true;
+        }
+
+        FileManager::DeleteFolder(
+            name);
+
+        Speak(
+            "Folder deletion requested.");
+
+        return true;
+    }
+
+    // ==========================================
+    // RENAME FILE / FOLDER
+    // ==========================================
+
+    if (cmd.find("rename ") == 0)
+    {
+        std::string remaining =
+            After(
+                cmd,
+                "rename ");
+
+        size_t separator =
+            remaining.find(" to ");
+
+        if (separator == std::string::npos)
+        {
+            Speak(
+                "Use rename old name to new name.");
+
+            return true;
+        }
+
+        std::string oldName =
+            remaining.substr(
+                0,
+                separator);
+
+        std::string newName =
+            remaining.substr(
+                separator + 4);
+
+        if (oldName.empty() ||
+            newName.empty())
+        {
+            Speak(
+                "Please provide both old and new names.");
+
+            return true;
+        }
+
+        FileManager::Rename(
+            oldName,
+            newName);
+
+        Speak(
+            "Rename operation requested.");
+
+        return true;
+    }
+
+    // ==========================================
     // MUSIC FOLDER
-    // =================================
+    // ==========================================
 
     if (cmd == "open music" ||
         cmd == "music")
     {
-        OpenFolder("shell:MyMusic");
+        OpenFolder(
+            "shell:MyMusic");
 
         Speak(
             "Opening your music folder.");
@@ -524,16 +722,27 @@ bool Command::ProcessCommand(
         return true;
     }
 
-    // =================================
-    // PLAY MUSIC FILE
-    // =================================
+    // ==========================================
+    // PLAY MUSIC
+    // ==========================================
 
     if (cmd.find("play ") == 0)
     {
         std::string file =
-            After(cmd, "play ");
+            After(
+                cmd,
+                "play ");
 
-        MusicManager::Play(file);
+        if (file.empty())
+        {
+            Speak(
+                "Please provide a music file.");
+
+            return true;
+        }
+
+        MusicManager::Play(
+            file);
 
         Speak(
             "Playing music.");
@@ -541,81 +750,111 @@ bool Command::ProcessCommand(
         return true;
     }
 
-    // =================================
+    // ==========================================
     // PAUSE MUSIC
-    // =================================
+    // ==========================================
 
     if (cmd == "pause music" ||
         cmd == "pause")
     {
         MusicManager::Pause();
 
-        Speak("Music paused.");
+        Speak(
+            "Music paused.");
 
         return true;
     }
 
-    // =================================
+    // ==========================================
     // RESUME MUSIC
-    // =================================
+    // ==========================================
 
     if (cmd == "resume music" ||
         cmd == "resume")
     {
         MusicManager::Resume();
 
-        Speak("Music resumed.");
+        Speak(
+            "Music resumed.");
 
         return true;
     }
 
-    // =================================
+    // ==========================================
     // STOP MUSIC
-    // =================================
+    // ==========================================
 
     if (cmd == "stop music")
     {
         MusicManager::Stop();
 
-        Speak("Music stopped.");
+        Speak(
+            "Music stopped.");
 
         return true;
     }
 
-    // =================================
+    // ==========================================
     // NOTES
-    // =================================
+    // ==========================================
 
     if (cmd.find("take note ") == 0)
     {
         std::string note =
-            After(cmd, "take note ");
+            After(
+                cmd,
+                "take note ");
 
-        NotesManager::AddNote(note);
+        if (note.empty())
+        {
+            Speak(
+                "Please tell me what to note.");
 
-        Speak("Your note has been saved.");
+            return true;
+        }
+
+        NotesManager::AddNote(
+            note);
+
+        Speak(
+            "Your note has been saved.");
 
         return true;
     }
+
+    // ==========================================
+    // SHOW NOTES
+    // ==========================================
 
     if (cmd == "show notes" ||
         cmd == "show my notes")
     {
         NotesManager::ShowNotes();
 
-        Speak("Here are your notes.");
+        Speak(
+            "Here are your notes.");
 
         return true;
     }
 
-    // =================================
+    // ==========================================
     // REMINDERS
-    // =================================
+    // ==========================================
 
     if (cmd.find("remind me ") == 0)
     {
         std::string reminder =
-            After(cmd, "remind me ");
+            After(
+                cmd,
+                "remind me ");
+
+        if (reminder.empty())
+        {
+            Speak(
+                "Please tell me what you want to remember.");
+
+            return true;
+        }
 
         ReminderManager::AddReminder(
             reminder);
@@ -625,6 +864,10 @@ bool Command::ProcessCommand(
 
         return true;
     }
+
+    // ==========================================
+    // SHOW REMINDERS
+    // ==========================================
 
     if (cmd == "show reminders" ||
         cmd == "show my reminders")
@@ -637,9 +880,9 @@ bool Command::ProcessCommand(
         return true;
     }
 
-    // =================================
+    // ==========================================
     // BATTERY
-    // =================================
+    // ==========================================
 
     if (cmd.find("battery") !=
         std::string::npos)
@@ -652,9 +895,9 @@ bool Command::ProcessCommand(
         return true;
     }
 
-    // =================================
-    // VOLUME
-    // =================================
+    // ==========================================
+    // VOLUME UP
+    // ==========================================
 
     if (cmd == "volume up" ||
         cmd == "increase volume" ||
@@ -662,10 +905,15 @@ bool Command::ProcessCommand(
     {
         VolumeManager::VolumeUp();
 
-        Speak("Volume increased.");
+        Speak(
+            "Volume increased.");
 
         return true;
     }
+
+    // ==========================================
+    // VOLUME DOWN
+    // ==========================================
 
     if (cmd == "volume down" ||
         cmd == "decrease volume" ||
@@ -673,24 +921,30 @@ bool Command::ProcessCommand(
     {
         VolumeManager::VolumeDown();
 
-        Speak("Volume decreased.");
+        Speak(
+            "Volume decreased.");
 
         return true;
     }
+
+    // ==========================================
+    // MUTE
+    // ==========================================
 
     if (cmd == "mute" ||
         cmd == "mute volume")
     {
         VolumeManager::Mute();
 
-        Speak("Mute toggled.");
+        Speak(
+            "Mute toggled.");
 
         return true;
     }
 
-    // =================================
+    // ==========================================
     // NEWS
-    // =================================
+    // ==========================================
 
     if (cmd == "news" ||
         cmd.find("latest news") !=
@@ -704,9 +958,9 @@ bool Command::ProcessCommand(
         return true;
     }
 
-    // =================================
-    // SYSTEM INFO
-    // =================================
+    // ==========================================
+    // SYSTEM INFORMATION
+    // ==========================================
 
     if (cmd == "system information" ||
         cmd == "system info" ||
@@ -720,26 +974,38 @@ bool Command::ProcessCommand(
         return true;
     }
 
-    // =================================
+    // ==========================================
     // APP LAUNCHER
-    // =================================
+    // ==========================================
 
     if (cmd.find("open app ") == 0)
     {
         std::string app =
-            After(cmd, "open app ");
+            After(
+                cmd,
+                "open app ");
 
-        AppLauncher::Open(app);
+        if (app.empty())
+        {
+            Speak(
+                "Please provide an application name.");
+
+            return true;
+        }
+
+        AppLauncher::Open(
+            app);
 
         Speak(
-            "Opening " + app);
+            "Opening " +
+            app);
 
         return true;
     }
 
-    // =================================
+    // ==========================================
     // AI FALLBACK
-    // =================================
+    // ==========================================
 
     std::cout
         << "[AI] Thinking...\n";

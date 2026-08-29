@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 
 #include "../include/logger.h"
 #include "../include/config.h"
@@ -9,9 +10,17 @@
 
 int main()
 {
+    // ==========================================
+    // START JARVIS
+    // ==========================================
+
     Logger::Log(
         "Jarvis Started",
         LogLevel::INFO);
+
+    // ==========================================
+    // CONFIGURATION
+    // ==========================================
 
     Config::Load();
 
@@ -31,66 +40,87 @@ int main()
         "Voice : " +
         Config::GetVoice());
 
-    // -----------------------------
-    // AI
-    // -----------------------------
-
-    AIManager::Initialize();
-
-    // -----------------------------
-    // API SERVER
-    // -----------------------------
-
-    APIServer::Start(8080);
-
-    std::cout
-        << "\n=================================\n"
-        << "          JARVIS READY\n"
-        << "=================================\n"
-        << "API: http://localhost:8080\n"
-        << "UI can now control JARVIS.\n"
-        << "Say goodbye to exit.\n\n";
-
-    // -----------------------------
-    // Speech
-    // -----------------------------
+    // ==========================================
+    // SPEECH
+    // ==========================================
 
     if (!SpeechManager::Initialize())
     {
         Logger::Log(
             "Speech initialization failed",
             LogLevel::ERROR);
+
+        return 1;
     }
+
+    // ==========================================
+    // AI
+    // ==========================================
+
+    AIManager::Initialize();
+
+    // ==========================================
+    // API SERVER
+    // ==========================================
+
+    if (!APIServer::Start(8080))
+    {
+        Logger::Log(
+            "API server failed to start",
+            LogLevel::ERROR);
+
+        SpeechManager::Shutdown();
+
+        return 1;
+    }
+
+    // ==========================================
+    // JARVIS READY
+    // ==========================================
+
+    std::cout
+        << "\n=================================\n"
+        << "          JARVIS READY\n"
+        << "=================================\n"
+        << "API Server : http://localhost:8080\n"
+        << "Frontend   : http://localhost:5173\n"
+        << "Voice      : Active\n"
+        << "Mode       : Manual Listening\n"
+        << "Say goodbye to exit.\n\n";
 
     bool running = true;
 
+    // ==========================================
+    // MAIN VOICE LOOP
+    // ==========================================
+
     while (running)
     {
-        std::string cmd =
+        std::string text =
             SpeechManager::Listen();
 
-        if (cmd.empty() ||
-            cmd == "[BLANK_AUDIO]")
+        if (text.empty() ||
+            text == "[BLANK_AUDIO]")
         {
             continue;
         }
 
         std::cout
             << "\nRecognized Text: "
-            << cmd
+            << text
             << "\n";
 
         running =
-            Command::ProcessCommand(cmd);
+            Command::ProcessCommand(text);
     }
 
-    // -----------------------------
-    // Shutdown
-    // -----------------------------
-
-    SpeechManager::Shutdown();
+    // ==========================================
+    // SHUTDOWN
+    // ==========================================
 
     APIServer::Stop();
+
+    SpeechManager::Shutdown();
 
     Logger::Log(
         "Jarvis Stopped",
