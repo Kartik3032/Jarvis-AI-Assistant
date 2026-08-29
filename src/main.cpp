@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 
 #include "../include/logger.h"
 #include "../include/config.h"
@@ -8,10 +9,6 @@
 
 int main()
 {
-    // -----------------------------
-    // Startup
-    // -----------------------------
-
     Logger::Log(
         "Jarvis Started",
         LogLevel::INFO);
@@ -34,10 +31,6 @@ int main()
         "Voice : " +
         Config::GetVoice());
 
-    // -----------------------------
-    // Speech Initialization
-    // -----------------------------
-
     if (!SpeechManager::Initialize())
     {
         Logger::Log(
@@ -46,10 +39,6 @@ int main()
 
         return 1;
     }
-
-    // -----------------------------
-    // AI Initialization
-    // -----------------------------
 
     AIManager::Initialize();
 
@@ -60,34 +49,27 @@ int main()
         << "Speak naturally.\n"
         << "Say goodbye to exit.\n\n";
 
-    // -----------------------------
-    // Main Loop
-    // -----------------------------
-
     bool running = true;
 
     while (running)
     {
-        std::string cmd = SpeechManager::Listen();
+        std::string command =
+            SpeechManager::Listen();
 
-        // Ignore empty / blank audio
-        if (cmd.empty() || cmd == "[BLANK_AUDIO]")
+        if (command.empty() ||
+            command == "[BLANK_AUDIO]")
         {
             continue;
         }
 
         std::cout
             << "\nRecognized Text: "
-            << cmd
+            << command
             << "\n";
 
-        // Send recognized speech to command processor
-        running = Command::ProcessCommand(cmd);
+        running =
+            Command::ProcessCommand(command);
     }
-
-    // -----------------------------
-    // Shutdown
-    // -----------------------------
 
     Logger::Log(
         "Jarvis Stopped",

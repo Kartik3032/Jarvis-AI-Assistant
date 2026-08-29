@@ -193,6 +193,17 @@ std::string SpeechManager::Listen()
 
     params.n_threads = 4;
 
+    // Better short-command recognition
+    params.no_context = true;
+    params.single_segment = false;
+
+    // Reduce hallucinations during silence/noise
+    params.no_speech_thold = 0.6f;
+
+    // Deterministic decoding
+    params.temperature = 0.0f;
+    params.temperature_inc = 0.0f;
+
     std::cout << "Transcribing...\n";
 
     int result =
