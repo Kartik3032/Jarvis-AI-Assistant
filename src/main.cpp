@@ -1,11 +1,11 @@
 #include <iostream>
-#include <string>
 
 #include "../include/logger.h"
 #include "../include/config.h"
 #include "../include/command.h"
 #include "../include/speech_manager.h"
 #include "../include/ai_manager.h"
+#include "../include/api_server.h"
 
 int main()
 {
@@ -31,45 +31,66 @@ int main()
         "Voice : " +
         Config::GetVoice());
 
-    if (!SpeechManager::Initialize())
-    {
-        Logger::Log(
-            "Speech initialization failed",
-            LogLevel::ERROR);
-
-        return 1;
-    }
+    // -----------------------------
+    // AI
+    // -----------------------------
 
     AIManager::Initialize();
+
+    // -----------------------------
+    // API SERVER
+    // -----------------------------
+
+    APIServer::Start(8080);
 
     std::cout
         << "\n=================================\n"
         << "          JARVIS READY\n"
         << "=================================\n"
-        << "Speak naturally.\n"
+        << "API: http://localhost:8080\n"
+        << "UI can now control JARVIS.\n"
         << "Say goodbye to exit.\n\n";
+
+    // -----------------------------
+    // Speech
+    // -----------------------------
+
+    if (!SpeechManager::Initialize())
+    {
+        Logger::Log(
+            "Speech initialization failed",
+            LogLevel::ERROR);
+    }
 
     bool running = true;
 
     while (running)
     {
-        std::string command =
+        std::string cmd =
             SpeechManager::Listen();
 
-        if (command.empty() ||
-            command == "[BLANK_AUDIO]")
+        if (cmd.empty() ||
+            cmd == "[BLANK_AUDIO]")
         {
             continue;
         }
 
         std::cout
             << "\nRecognized Text: "
-            << command
+            << cmd
             << "\n";
 
         running =
-            Command::ProcessCommand(command);
+            Command::ProcessCommand(cmd);
     }
+
+    // -----------------------------
+    // Shutdown
+    // -----------------------------
+
+    SpeechManager::Shutdown();
+
+    APIServer::Stop();
 
     Logger::Log(
         "Jarvis Stopped",

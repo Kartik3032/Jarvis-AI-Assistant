@@ -1,0 +1,426 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background: #05060b;
+  color: #f4f4f8;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 20%,
+      rgba(119, 52, 255, 0.1),
+      transparent 35%),
+    radial-gradient(circle at 80% 80%,
+      rgba(70, 30, 180, 0.08),
+      transparent 35%),
+    #05060b;
+}
+
+/* HEADER */
+
+.header {
+  height: 84px;
+  border-bottom: 1px solid #1d1e28;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5%;
+  background: rgba(5, 6, 11, 0.9);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.brandIcon {
+  width: 50px;
+  height: 50px;
+  border: 1px solid #994cff;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  color: #a855f7;
+  box-shadow:
+    0 0 20px rgba(145, 60, 255, 0.3);
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: 5px;
+}
+
+.brand span {
+  font-size: 11px;
+  color: #777784;
+  letter-spacing: 4px;
+}
+
+.systemStatus {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #a855f7;
+  font-size: 13px;
+  letter-spacing: 2px;
+}
+
+.statusDot,
+.conversationDot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #555;
+}
+
+.statusDot.online,
+.conversationDot.active {
+  background: #22c55e;
+  box-shadow:
+    0 0 15px rgba(34, 197, 94, 0.8);
+}
+
+/* MAIN */
+
+.main {
+  width: 92%;
+  max-width: 1400px;
+  margin: 40px auto;
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 28px;
+}
+
+/* PANELS */
+
+.controlPanel,
+.conversation {
+  border: 1px solid #20212d;
+  border-radius: 22px;
+  background: rgba(12, 13, 22, 0.9);
+  overflow: hidden;
+}
+
+.controlPanel {
+  padding: 40px;
+  min-height: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* MIC */
+
+.micCircle {
+  margin-top: 10px;
+  width: 215px;
+  height: 215px;
+  border-radius: 50%;
+  border: 1px solid #9b4dff;
+  display: grid;
+  place-items: center;
+  box-shadow:
+    0 0 35px rgba(139, 61, 255, 0.35);
+  transition: 0.3s;
+}
+
+.micCircle:hover,
+.micCircle.listening {
+  transform: scale(1.04);
+  box-shadow:
+    0 0 65px rgba(139, 61, 255, 0.6);
+}
+
+.micInner {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 1px solid #833cff;
+  display: grid;
+  place-items: center;
+  color: #a855f7;
+  background: #100b21;
+}
+
+.controlPanel h2 {
+  margin: 35px 0 8px;
+  letter-spacing: 3px;
+  font-size: 27px;
+}
+
+.controlPanel>p {
+  margin: 0;
+  color: #777784;
+}
+
+.listenButton {
+  margin-top: 28px;
+  padding: 15px 30px;
+  border-radius: 13px;
+  border: 1px solid #984cff;
+  background: #21103f;
+  color: #d8b9ff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.listenButton:hover {
+  background: #2d1455;
+}
+
+/* STATUS */
+
+.statusGrid {
+  width: 100%;
+  margin-top: 35px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.statusCard {
+  min-height: 70px;
+  border: 1px solid #20212d;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 15px;
+}
+
+.statusCard svg {
+  color: #a855f7;
+}
+
+.statusCard small {
+  display: block;
+  color: #777784;
+  font-size: 9px;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+.statusCard strong {
+  font-size: 13px;
+}
+
+/* QUICK */
+
+.quickCommands {
+  width: 100%;
+  margin-top: 28px;
+}
+
+.quickCommands h3 {
+  font-size: 10px;
+  color: #777784;
+  letter-spacing: 2px;
+}
+
+.quickGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.quickGrid button {
+  border: 1px solid #252632;
+  border-radius: 10px;
+  background: #0d0e16;
+  color: #a8a8b2;
+  padding: 12px 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+}
+
+.quickGrid button:hover {
+  border-color: #9148ed;
+  color: #c78cff;
+}
+
+.quickGrid svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* CONVERSATION */
+
+.conversation {
+  min-height: 700px;
+  display: flex;
+  flex-direction: column;
+}
+
+.conversationHeader {
+  padding: 30px;
+  border-bottom: 1px solid #20212d;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.conversationHeader h2 {
+  margin: 0 0 7px;
+  font-size: 27px;
+}
+
+.conversationHeader span {
+  color: #777784;
+  letter-spacing: 2px;
+  font-size: 10px;
+}
+
+.messages {
+  flex: 1;
+  padding: 28px;
+  overflow-y: auto;
+}
+
+.messageRow {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.messageRow.user {
+  flex-direction: row-reverse;
+}
+
+.messageIcon {
+  min-width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #21103e;
+  color: #a855f7;
+  display: grid;
+  place-items: center;
+}
+
+.messageBubble {
+  max-width: 75%;
+  padding: 13px 17px;
+  border: 1px solid #252632;
+  border-radius: 12px;
+  background: #13141d;
+}
+
+.messageRow.user .messageBubble {
+  background: #21103e;
+}
+
+.messageBubble span {
+  color: #9c51f4;
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+
+.messageBubble p {
+  margin: 7px 0 0;
+  color: #dedee5;
+  line-height: 1.5;
+}
+
+/* COMMAND */
+
+.commandBox {
+  border-top: 1px solid #20212d;
+  padding: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.commandBox input {
+  flex: 1;
+  background: #0a0b12;
+  border: 1px solid #272834;
+  border-radius: 12px;
+  padding: 15px;
+  color: white;
+  outline: none;
+}
+
+.commandBox input:focus {
+  border-color: #9148ed;
+}
+
+.commandBox button {
+  width: 55px;
+  border: 0;
+  border-radius: 12px;
+  background: #7129db;
+  color: white;
+}
+
+.commandBox button:hover {
+  background: #8639ef;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 950px) {
+  .main {
+    grid-template-columns: 1fr;
+  }
+
+  .controlPanel,
+  .conversation {
+    min-height: auto;
+  }
+
+  .quickGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 550px) {
+  .header {
+    padding: 0 20px;
+  }
+
+  .systemStatus {
+    display: none;
+  }
+
+  .main {
+    width: 95%;
+    margin: 20px auto;
+  }
+
+  .controlPanel {
+    padding: 25px 15px;
+  }
+
+  .quickGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .micCircle {
+    width: 180px;
+    height: 180px;
+  }
+
+  .micInner {
+    width: 125px;
+    height: 125px;
+  }
+}
